@@ -4,19 +4,20 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "80:80/tcp"
     environment:
       TZ: 'Asia/Kolkata'
       WEBPASSWORD: 'rahul99'
+      SERVERIP: '192.168.69.11'
 
     volumes:
-      - '/home/rahools/docker-volumes/etc-pihole/:/etc/pihole/'
-      - '/home/rahools/docker-volumes/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+      - '/home/rahools/docker-volumes/pihole/etc-pihole/:/etc/pihole/'
+      - '/home/rahools/docker-volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
     cap_add:
       - NET_ADMIN
     restart: unless-stopped
-    network_mode: host
+    network_mode:
+      - host
+      - ipv6
