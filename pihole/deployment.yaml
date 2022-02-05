@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-default-pihole
+  name: pihole
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-default-pihole
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-default-pihole
+    spec:
+      containers:
+      - env:
+        - name: ServerIP
+          value: {{server_ip}}
+        - name: TZ
+          value: {{time_zone}}
+        image: pihole/pihole:latest
+        imagePullPolicy: Always
+        name: pihole
+        ports:
+        - containerPort: 53
+          hostPort: 53
+          name: pihole-dns-tcp
+          protocol: TCP
+        - containerPort: 53
+          hostPort: 53
+          name: pihole-dns-udp
+          protocol: UDP
+        - containerPort: 80
+          hostPort: {{http_port}}
+          name: pihole-dns-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /etc/pihole/
+          name: pihole-etc
+        - mountPath: /etc/dnsmasq.d/
+          name: pihole-dnsmasq
+      dnsConfig:
+        nameservers:
+        - 127.0.0.1
+        - 1.1.1.1
+      volumes:
+      - hostPath:
+          path: /home/rahools/mount-vols/pihole/etc/pihole/
+          type: ""
+        name: pihole-etc
+      - hostPath:
+          path: /home/rahools/mount-vols/pihole/etc/dnsmasq.d/
+          type: ""
+        name: pihole-dnsmasq

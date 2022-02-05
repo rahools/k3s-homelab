@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-default-ha
+  name: ha
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-default-ha
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-default-ha
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Asia/Kolkata
+        image: ghcr.io/home-assistant/home-assistant:stable
+        imagePullPolicy: Always
+        name: ha
+        ports:
+        - containerPort: 8123
+          hostPort: 8123
+          name: ha-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /config
+          name: config
+      volumes:
+      - hostPath:
+          path: /home/rahools/mount-vols/ha/config
+          type: ""
+        name: config
