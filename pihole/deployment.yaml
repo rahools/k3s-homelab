@@ -17,10 +17,8 @@ spec:
     spec:
       containers:
       - env:
-        - name: ServerIP
-          value: {{server_ip}}
         - name: TZ
-          value: {{time_zone}}
+          value: Asia/Kolkata
         image: pihole/pihole:latest
         imagePullPolicy: Always
         name: pihole
@@ -34,7 +32,7 @@ spec:
           name: pihole-dns-udp
           protocol: UDP
         - containerPort: 80
-          hostPort: {{http_port}}
+          hostPort: 8080
           name: pihole-dns-http
           protocol: TCP
         volumeMounts:
@@ -48,10 +46,10 @@ spec:
         - 1.1.1.1
       volumes:
       - hostPath:
-          path: /home/rahools/mount-vols/pihole/etc/pihole/
+          path: ./pihole/etc/pihole/
           type: ""
         name: pihole-etc
       - hostPath:
-          path: /home/rahools/mount-vols/pihole/etc/dnsmasq.d/
+          path: ./pihole/etc/dnsmasq.d/
           type: ""
         name: pihole-dnsmasq

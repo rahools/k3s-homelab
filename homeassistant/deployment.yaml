@@ -32,6 +32,6 @@ spec:
           name: config
       volumes:
       - hostPath:
-          path: /home/rahools/mount-vols/ha/config
+          path: ./ha/config
           type: ""
         name: config

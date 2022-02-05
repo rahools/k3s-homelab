@@ -33,14 +33,14 @@ spec:
           name: log
       volumes:
       - hostPath:
-          path: /home/rahools/mount-vols/mqtt/config
+          path: ./mqtt/config
           type: ""
         name: config
       - hostPath:
-          path: /home/rahools/mount-vols/mqtt/data
+          path: ./mqtt/data
           type: ""
         name: data
       - hostPath:
-          path: /home/rahools/mount-vols/mqtt/log
+          path: ./mqtt/log
           type: ""
         name: log
