@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+  name: jellyfin
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+    spec:
+      containers:
+      - image: jellyfin/jellyfin
+        imagePullPolicy: Always
+        name: jellyfin
+        ports:
+        - containerPort: 8096
+          hostPort: 8096
+          name: jellyfin-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /cache
+          name: cache
+        - mountPath: /media
+          name: media
+      volumes:
+      - hostPath:
+          path: ./jellyfin/config
+          type: ""
+        name: config
+      - hostPath:
+          path: ./jellyfin/cache
+          type: ""
+        name: cache
+      - hostPath:
+          path: ./jellyfin/media
+          type: ""
+        name: media
