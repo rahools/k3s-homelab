@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-default-minecraft
+  name: minecraft
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-default-minecraft
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-default-minecraft
+    spec:
+      containers:
+      - image: itzg/minecraft-server
+        imagePullPolicy: Always
+        name: minecraft
+        env:
+        - name: EULA
+          value: "true"
+        ports:
+        - containerPort: 25565
+          hostPort: 25565
+          name: minecraft-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      volumes:
+      - hostPath:
+          path: /home/rahools/k3s-data/minecraft
+          type: ""
+        name: data

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-default-terraria
+  name: terraria
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-default-terraria
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-default-terraria
+    spec:
+      containers:
+      - image: ryshe/terraria
+        imagePullPolicy: Always
+        name: terraria
+        # args: ["-world", "/root/.local/share/Terraria/Worlds/here-we-go-again.wld", "-autocreate", "3"]
+        env:
+        - name: WORLD_FILENAME
+          value: "here-we-go-again.wld"
+        ports:
+        - containerPort: 7777 
+          hostPort: 7777 
+          name: terraria-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /root/.local/share/Terraria/Worlds
+          name: data
+      volumes:
+      - hostPath:
+          path: /home/rahools/k3s-data/terraria
+          type: ""
+        name: data
