@@ -2,27 +2,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    workload.user.cattle.io/workloadselector: deployment-default-jellyfin
-  name: jellyfin
+    workload.user.cattle.io/workloadselector: deployment-default-bazarr
+  name: bazarr
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+      workload.user.cattle.io/workloadselector: deployment-default-bazarr
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+        workload.user.cattle.io/workloadselector: deployment-default-bazarr
     spec:
       containers:
-      - image: jellyfin/jellyfin
+      - image: hotio/bazarr:latest
         imagePullPolicy: Always
-        name: jellyfin
+        name: bazarr
         ports:
-        - containerPort: 8096
-          hostPort: 8096
-          name: jellyfin-http
+        - containerPort: 6767
+          hostPort: 6767
+          name: bazarr-http
           protocol: TCP
         volumeMounts:
         - mountPath: /config
@@ -35,11 +35,11 @@ spec:
           name: movies
       volumes:
       - hostPath:
-          path: /home/rahools/k3s-data/jellyfin/jellyfin/config
+          path: /home/rahools/k3s-data/bazarr/bazarr/config
           type: ""
         name: config
       - hostPath:
-          path: /home/rahools/k3s-data/jellyfin/jellyfin/cache
+          path: /home/rahools/k3s-data/bazarr/bazarr/cache
           type: ""
         name: cache
       - hostPath:

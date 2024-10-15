@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarr-service
+spec:
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-default-sonarr
+  ports:
+  - protocol: TCP
+    port: 8989
+    targetPort: 8989

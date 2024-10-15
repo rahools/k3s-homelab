@@ -2,27 +2,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    workload.user.cattle.io/workloadselector: deployment-default-jellyfin
-  name: jellyfin
+    workload.user.cattle.io/workloadselector: deployment-default-sonarr
+  name: sonarr
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+      workload.user.cattle.io/workloadselector: deployment-default-sonarr
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-default-jellyfin
+        workload.user.cattle.io/workloadselector: deployment-default-sonarr
     spec:
       containers:
-      - image: jellyfin/jellyfin
+      - image: hotio/sonarr:latest
         imagePullPolicy: Always
-        name: jellyfin
+        name: sonarr
         ports:
-        - containerPort: 8096
-          hostPort: 8096
-          name: jellyfin-http
+        - containerPort: 8989
+          hostPort: 8989
+          name: sonarr-http
           protocol: TCP
         volumeMounts:
         - mountPath: /config
@@ -35,11 +35,11 @@ spec:
           name: movies
       volumes:
       - hostPath:
-          path: /home/rahools/k3s-data/jellyfin/jellyfin/config
+          path: /home/rahools/k3s-data/sonarr/sonarr/config
           type: ""
         name: config
       - hostPath:
-          path: /home/rahools/k3s-data/jellyfin/jellyfin/cache
+          path: /home/rahools/k3s-data/sonarr/sonarr/cache
           type: ""
         name: cache
       - hostPath:
