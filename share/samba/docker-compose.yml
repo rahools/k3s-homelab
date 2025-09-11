@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  samba:
+    image: dperson/samba
+    container_name: samba_server
+    ports:
+      - "139:139" # NetBIOS Session Service
+      - "445:445" # SMB over TCP/IP
+    volumes:
+      - /mnt/sda1:/mount
+    restart: unless-stopped
+    command: '-s "mount;/mount;yes;no;no;rahools" -u "rahools;Rahul99" -p -w MyWorkgroup -n'

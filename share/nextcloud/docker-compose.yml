@@ -1,0 +1,89 @@
+# ===================================================================================================================
+# READ THIS NOTICE BEFORE YOU PROCEED
+# ===================================================================================================================
+# This is an example docker compose file for running Nextcloud with Memories.
+# This file is provided as an example only and is not intended to be used as-is.
+# You will need all files in this directory for the example to work.
+#
+# The example assumes the existence of two disks, hdd and ssd.
+# You can replace both with a single mount point if you don't have separate disks.
+#
+# 1. Make sure all placeholders are replaced with the correct values.
+#    Choose a strong password for the database.
+# 2. Use an appropriate nginx.conf, and adjust it according to your needs.
+#    If you intend to use a second reverse proxy for TLS, you can use this example:
+#    https://github.com/nextcloud/docker/blob/master/.examples/docker-compose/insecure/mariadb/fpm/web/nginx.conf
+#    In the example below, Nextcloud will be exposed on port 8500
+# 3. Make sure the Dockerfile uses the Nextcloud version you want to see
+#    To update Nextcloud, you can simply change the version and run `docker compose build`
+# 4. The preview generator cron job is pre-configured, but you still need to install the app
+#    and do the initial generation run. https://github.com/nextcloud/previewgenerator
+# ===================================================================================================================
+
+services:
+  redis:
+    image: redis:alpine
+    pull_policy: always
+    restart: always
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - redis
+    volumes:
+      - /mnt/sda1/nextcloud-new:/var/www/html
+      # Once Nextcloud is installed, you may move the app data folder to a faster storage
+      # and mount it here. This is optional, but recommended for better performance.
+      # The <instanceid> will depend on the particular Nextcloud instance.
+      # You will then need to make the same change in the cron service below.
+      # - /ssd/nc_appdata_<instanceid>:/var/www/html/data/appdata_<instanceid>
+    environment:
+      - NEXTCLOUD_TRUSTED_DOMAINS=ncc.rahools.com
+      - TZ=Asia/Kolkata
+      - POSTGRES_DB=${NEXTCLOUD_POSTGRES_DB}
+      - POSTGRES_USER=${NEXTCLOUD_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${NEXTCLOUD_POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${NEXTCLOUD_POSTGRES_HOST}
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      - PGSSLCERT=/tmp/postgresql.crt
+      - REDIS_HOST=redis
+      - OVERWRITEPROTOCOL=https
+      - PHP_MEMORY_LIMIT=1G
+      - PHP_UPLOAD_LIMIT=12G
+      - DEBIAN_FRONTEND=noninteractive
+
+  web:
+    image: nginx:alpine
+    pull_policy: always
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - 127.0.0.1:8500:80
+    volumes:
+      - /mnt/sda1/nextcloud-new:/var/www/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  go-vod:
+    image: radialapps/go-vod
+    pull_policy: always
+    restart: always
+    init: true
+    depends_on:
+      - app
+    environment:
+      - NEXTCLOUD_HOST=https://ncc.rahools.com
+      # - NEXTCLOUD_ALLOW_INSECURE=1 # (self-signed certs or no HTTPS)
+      - NVIDIA_VISIBLE_DEVICES=all
+
+    volumes:
+      - /mnt/sda1/nextcloud-new/data:/var/www/html/data:ro
+
+    # Uncomment the following lines for QSV / VA-API:
+    # devices:
+    #  - /dev/dri:/dev/dri
+
+    # Uncomment the following lines for NVENC
+    # runtime: nvidia

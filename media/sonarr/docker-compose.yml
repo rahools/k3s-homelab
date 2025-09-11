@@ -1,0 +1,15 @@
+services:
+  sonarr:
+    container_name: sonarr
+    restart: unless-stopped
+    image: ghcr.io/hotio/sonarr
+    ports:
+      - "8989:8989"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Etc/UTC
+    volumes:
+      - /mnt/sda1/media-mounts/sonarr-config:/config
+      - /mnt/sda1/media-mounts/media:/data
