@@ -16,3 +16,9 @@ services:
       - 6881:6881/udp # qBittorrent client UDP port
       - 8080:8080 # Web UI port
     restart: unless-stopped
+    networks:
+      - media-network
+
+networks:
+  media-network:
+    external: true

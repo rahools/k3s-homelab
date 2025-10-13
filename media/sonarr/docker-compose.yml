@@ -13,3 +13,9 @@ services:
     volumes:
       - /mnt/sda1/media-mounts/sonarr-config:/config
       - /mnt/sda1/media-mounts/media:/data
+    networks:
+      - media-network
+
+networks:
+  media-network:
+    external: true

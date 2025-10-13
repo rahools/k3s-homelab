@@ -1,0 +1,20 @@
+version: '3'
+services:
+  evolution-api:
+    container_name: evolution_api
+    image: evoapicloud/evolution-api:latest
+    ports:
+      - "9876:8080"
+    env_file:
+      - .env
+    volumes:
+      - /mnt/sda1/homelab-config/evolutionapi/evolution_store:/evolution/store
+      - /mnt/sda1/homelab-config/evolutionapi/evolution_instances:/evolution/instances
+  
+  redis:
+    image: redis
+    restart: always
+
+volumes:
+  evolution_store:
+  evolution_instances:
