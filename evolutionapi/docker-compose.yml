@@ -1,6 +1,6 @@
 version: '3'
 services:
-  evolution-api:
+  evolution:
     container_name: evolution_api
     image: evoapicloud/evolution-api:latest
     ports:
@@ -10,11 +10,37 @@ services:
     volumes:
       - /mnt/sda1/homelab-config/evolutionapi/evolution_store:/evolution/store
       - /mnt/sda1/homelab-config/evolutionapi/evolution_instances:/evolution/instances
+    depends_on:
+      - redis
   
   redis:
     image: redis
     restart: always
 
+  nitro:
+    image: ghcr.io/rahools/sitolia-evolution-nitro-webhook:latest
+    pull_policy: always
+    container_name: sitolia-evolution-webhook
+    ports:
+      - "9877:3000"
+    volumes:
+      # Persist webhook events data
+      - /mnt/sda1/homelab-config/evolutionapi/nitro_webhook_data:/app/data
+    environment:
+      - NODE_ENV=production
+      - EVOLUTION_BASE_URL=http://evolution:8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/webhook/evolution"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - evolution
+
+
 volumes:
   evolution_store:
   evolution_instances:
+  nitro_webhook_data:
