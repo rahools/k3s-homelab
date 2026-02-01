@@ -13,13 +13,24 @@ services:
     depends_on:
       - redis
   
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - /mnt/sda1/homelab-config/evolutionapi/postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis
     restart: always
 
   nitro:
     image: ghcr.io/rahools/sitolia-evolution-nitro-webhook:latest
-    pull_policy: always
+      # pull_policy: always
     container_name: sitolia-evolution-webhook
     ports:
       - "9877:3000"
@@ -41,6 +52,7 @@ services:
 
 
 volumes:
+  postgres_data:
   evolution_store:
   evolution_instances:
   nitro_webhook_data:
